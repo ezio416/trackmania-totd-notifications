@@ -21,3 +21,5 @@ jobs:
       #     pip install discord-webhook requests
       - name: run script
         run: python -m main
+        env:
+          DEV_TMIO_API_BASE: ${{ env.DEV_TMIO_API_BASE }}
