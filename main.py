@@ -1,11 +1,18 @@
 # c 2024-02-08
 # m 2024-02-08
 
+from base64 import b64encode
 from json import loads
 import os
+from time import sleep
 
 from discord_webhook import DiscordEmbed, DiscordWebhook
-from requests import get
+from requests import get, post
+
+
+url_core = 'https://prod.trackmania.core.nadeo.online'
+url_live = 'https://live-services.trackmania.nadeo.live'
+wait_time = 0.5
 
 
 def format_race_time(input_ms: int) -> str:
@@ -14,6 +21,121 @@ def format_race_time(input_ms: int) -> str:
     ms:  int = input_ms % 1000
 
     return f'{min}:{str(sec).zfill(2)}.{str(ms).zfill(3)}'
+
+
+def get_account_name(id: str) -> str:
+    print(f'getting account name for {id}')
+
+    sleep(wait_time)
+    req = get(
+        f'https://api.trackmania.com/api/display-names?accountId[]={id}',
+        headers={'Authorization': get_token('OAuth')}
+    )
+
+    loaded: dict = loads(req.text)
+    name:   str  = loaded[id]
+
+    print(f'getting account name for {id} ({name}) done')
+
+    return name
+
+
+def get_map_info(track: dict) -> dict:
+    print(f"getting map info for {track['uid']}")
+
+    sleep(wait_time)
+    req = get(
+        f"{url_core}/maps?mapUidList={track['uid']}",
+        headers={'Authorization': get_token('NadeoServices')}
+    )
+
+    loaded: dict = loads(req.text)
+    single: dict = loaded[0]
+
+    track['author_id']   = single['author']
+    track['author_time'] = format_race_time(single['authorScore'])
+    track['name']        = strip_format_codes(single['name'])
+    track['thumb_url']   = single['thumbnailUrl']
+
+    print(f"getting map info for {track['uid']} ({track['name']}) done")
+
+    return track
+
+
+def get_token(audience: str) -> str:
+    print(f'getting token for {audience}')
+
+    sleep(wait_time)
+
+    if audience == 'OAuth':
+        req = post(
+            'https://api.trackmania.com/api/access_token',
+            headers={'Content-Type': 'application/x-www-form-urlencoded'},
+            data={
+                'grant_type': 'client_credentials',
+                'client_id': os.environ['TM_OAUTH_IDENTIFIER'],
+                'client_secret': os.environ['TM_OAUTH_SECRET']
+            }
+        )
+
+        loaded: dict = loads(req.text)
+        token:  str  = loaded['access_token']
+
+    else:
+        req = post(
+            f'{url_core}/v2/authentication/token/basic',
+            headers={
+                'Authorization': f"Basic {b64encode(f'{os.environ['TM_TOTD_NOTIF_SERVER_USERNAME']}:{os.environ['TM_TOTD_NOTIF_SERVER_PASSWORD']}'.encode('utf-8')).decode('ascii')}",
+                'Content-Type': 'application/json',
+                'Ubi-AppId': '86263886-327a-4328-ac69-527f0d20a237',  # TM2020's ID
+                'User-Agent': os.environ['TM_TOTD_NOTIF_AGENT'],
+            },
+            json={'audience': audience}
+        )
+
+        loaded: dict = loads(req.text)
+        token:  str  = f"nadeo_v1 t={loaded['accessToken']}"
+
+    print(f'got token for {audience}')
+
+    return token
+
+
+def get_track() -> dict:
+    print("getting today's TOTD")
+
+    sleep(wait_time)
+    req = get(
+        f'{url_live}/api/token/campaign/month?length=1&offset=0',
+        headers={'Authorization': get_token('NadeoLiveServices')}
+    )
+
+    loaded:    dict = loads(req.text)
+    monthList: dict = loaded['monthList'][0]
+
+    year:  int = monthList['year']
+    month: int = monthList['month']
+
+    uid: str = ''
+    day: int = 0
+    season: str = ''
+
+    for map in reversed(monthList['days']):
+        if map['mapUid'] != '':
+            uid    = map['mapUid']
+            day    = map['monthDay']
+            season = map['seasonUid']
+            break
+
+    track: dict = {
+        'date': f'{year}-{str(month).zfill(2)}-{str(day).zfill(2)}',
+        'season': season,
+        'uid': uid
+    }
+
+    print(f"getting today's TOTD ({track['date']}) done")
+
+    return track
 
 
 def strip_format_codes(raw: str) -> str:
@@ -37,45 +159,34 @@ def strip_format_codes(raw: str) -> str:
 
 
 def main():
-    req = get(
-        url = os.environ['DEV_TMIO_API_BASE'] + 'totd/0',
-        headers={'User-Agent': os.environ['DEV_TOTD_NOTIF_AGENT_TMIO']}
-    )
+    track: dict = get_track()
+    track = get_map_info(track)
+    track['author_name'] = get_account_name(track['author_id'])
 
-    loaded: dict = loads(req.text)
-
-    year:  int  = loaded['year']
-    month: int  = loaded['month']
-    day:   int  = len(loaded['days'])
-    map:   dict = loaded['days'][-1]['map']
-
-    author_id:     str = map['author']
-    name:          str = strip_format_codes(map['name'])
-    authorTime:    int = map['authorScore']
-    uid:           str = map['mapUid']
-    thumbnail_url: str = map['thumbnailUrl']
-    author_name:   str = map['authorplayer']['name']
-
-    tmio_author_url: str = 'https://trackmania.io/#/player/' + author_id
-    tmio_map_url:    str = 'https://trackmania.io/#/leaderboard/' + uid
+    tmio_author_url: str = f"https://trackmania.io/#/player/{track['author_id']}"
+    tmio_map_url:    str = f"https://trackmania.io/#/totd/leaderboard/{track['season']}/{track['uid']}"
 
 ########################################################################################################################
 
-    webhook = DiscordWebhook(os.environ['DEV_TOTD_NOTIF_DISCORD_WEBHOOK'])
+    print('webhook starting')
+
+    webhook = DiscordWebhook(os.environ['TM_TOTD_NOTIF_DISCORD_WEBHOOK_URL'])
 
     embed = DiscordEmbed(
-        title=f'Track of the Day for {year}-{str(month).zfill(2)}-{str(day).zfill(2)}',
+        title=f"Track of the Day for {track['date']}",
         color='00a719'
     )
 
-    embed.add_embed_field('Map',          f'[{name}]({tmio_map_url})',           False)
-    embed.add_embed_field('Author',       f'[{author_name}]({tmio_author_url})', False)
-    embed.add_embed_field('Author Medal', format_race_time(authorTime),          False)
-    embed.set_thumbnail(thumbnail_url)
+    embed.add_embed_field('Map',          f"[{track['name']}]({tmio_map_url})",           False)
+    embed.add_embed_field('Author',       f"[{track['author_name']}]({tmio_author_url})", False)
+    embed.add_embed_field('Author Medal', track['author_time'],                           False)
+    embed.set_thumbnail(track['thumb_url'])
 
     webhook.add_embed(embed)
 
     webhook.execute()
+
+    print("webhook done")
 
 
 if __name__ == '__main__':
