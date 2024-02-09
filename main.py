@@ -41,11 +41,11 @@ def get_account_name(id: str) -> str:
 
 
 def get_map_info(track: dict) -> dict:
-    print(f"getting map info for {track['uid']}")
+    print(f'getting map info for {track['uid']}')
 
     sleep(wait_time)
     req = get(
-        f"{url_core}/maps?mapUidList={track['uid']}",
+        f'{url_core}/maps?mapUidList={track['uid']}',
         headers={'Authorization': get_token('NadeoServices')}
     )
 
@@ -59,7 +59,7 @@ def get_map_info(track: dict) -> dict:
 
     track['author_name'] = get_account_name(track['author_id'])
 
-    print(f"getting map info for {track['uid']} ({track['name']}) done")
+    print(f'getting map info for {track['uid']} ({track['name']}) done')
 
     return track
 
@@ -87,7 +87,7 @@ def get_token(audience: str) -> str:
         req = post(
             f'{url_core}/v2/authentication/token/basic',
             headers={
-                'Authorization': f"Basic {b64encode(f'{os.environ['TM_TOTD_NOTIF_SERVER_USERNAME']}:{os.environ['TM_TOTD_NOTIF_SERVER_PASSWORD']}'.encode('utf-8')).decode('ascii')}",
+                'Authorization': f'Basic {b64encode(f'{os.environ['TM_TOTD_NOTIF_SERVER_USERNAME']}:{os.environ['TM_TOTD_NOTIF_SERVER_PASSWORD']}'.encode('utf-8')).decode('ascii')}',
                 'Content-Type': 'application/json',
                 'Ubi-AppId': '86263886-327a-4328-ac69-527f0d20a237',  # TM2020's ID
                 'User-Agent': os.environ['TM_TOTD_NOTIF_AGENT'],
@@ -96,7 +96,7 @@ def get_token(audience: str) -> str:
         )
 
         loaded: dict = loads(req.text)
-        token:  str  = f"nadeo_v1 t={loaded['accessToken']}"
+        token:  str  = f'nadeo_v1 t={loaded['accessToken']}'
 
     print(f'got token for {audience}')
 
@@ -104,7 +104,7 @@ def get_token(audience: str) -> str:
 
 
 def get_track() -> dict:
-    print("getting today's TOTD")
+    print('getting today\'s TOTD')
 
     sleep(wait_time)
     req = get(
@@ -135,7 +135,7 @@ def get_track() -> dict:
         'uid': uid
     }
 
-    print(f"getting today's TOTD ({track['date']}) done")
+    print(f'getting today\'s TOTD ({track['date']}) done')
 
     return track
 
@@ -171,12 +171,12 @@ def main():
     )
 
     embed = DiscordEmbed(
-        title=f"Track of the Day for {track['date']}",
+        title=f'Track of the Day for {track['date']}',
         color='00a719'
     )
 
-    embed.add_embed_field('Map', f"[{track['name']}](https://trackmania.io/#/totd/leaderboard/{track['season']}/{track['uid']})", False)
-    embed.add_embed_field('Author', f"[{track['author_name']}](https://trackmania.io/#/player/{track['author_id']})", False)
+    embed.add_embed_field('Map', f'[{track['name']}](https://trackmania.io/#/totd/leaderboard/{track['season']}/{track['uid']})', False)
+    embed.add_embed_field('Author', f'[{track['author_name']}](https://trackmania.io/#/player/{track['author_id']})', False)
     embed.add_embed_field('Author Medal', track['author_time'], False)
     embed.set_thumbnail(track['thumb_url'])
 
@@ -184,7 +184,7 @@ def main():
 
     webhook.execute()
 
-    print("webhook done")
+    print('webhook done')
 
 
 if __name__ == '__main__':
