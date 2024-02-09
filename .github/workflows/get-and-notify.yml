@@ -22,4 +22,4 @@ jobs:
       - name: run script
         run: python -m main
         env:
-          DEV_TMIO_API_BASE: ${{ DEV_TMIO_API_BASE }}
+          DEV_TMIO_API_BASE: ${{ vars.DEV_TMIO_API_BASE }}

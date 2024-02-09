@@ -37,7 +37,8 @@ import os
 
 
 def main():
-    print(os.environ['DEV_TMIO_API_BASE'])
+    # print(os.environ['DEV_TMIO_API_BASE'])
+    print(os.environ)
 
     # req = get(
     #     url = os.environ['DEV_TMIO_API_BASE'] + 'totd/0',
