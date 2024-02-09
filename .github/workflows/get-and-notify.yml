@@ -22,7 +22,7 @@ jobs:
       - name: run script
         run: python -m main
         env:
-          TM_OAUTH_INDENTIFIER:              ${{ vars.TM_OAUTH_INDENTIFIER }}
+          TM_OAUTH_IDENTIFIER:               ${{ vars.TM_OAUTH_IDENTIFIER }}
           TM_OAUTH_SECRET:                   ${{ vars.TM_OAUTH_SECRET }}
           TM_TOTD_NOTIF_AGENT:               ${{ vars.TM_TOTD_NOTIF_AGENT }}
           TM_TOTD_NOTIF_DISCORD_WEBHOOK_URL: ${{ vars.TM_TOTD_NOTIF_DISCORD_WEBHOOK_URL }}
