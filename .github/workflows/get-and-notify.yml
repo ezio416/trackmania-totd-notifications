@@ -22,6 +22,9 @@ jobs:
       - name: run script
         run: python -m main
         env:
-          DEV_TMIO_API_BASE: ${{ vars.DEV_TMIO_API_BASE }}
-          DEV_TOTD_NOTIF_AGENT_TMIO: ${{ vars.DEV_TOTD_NOTIF_AGENT_TMIO }}
-          DEV_TOTD_NOTIF_DISCORD_WEBHOOK: ${{ vars.DEV_TOTD_NOTIF_DISCORD_WEBHOOK }}
+          TM_OAUTH_INDENTIFIER:              ${{ vars.TM_OAUTH_INDENTIFIER }}
+          TM_OAUTH_SECRET:                   ${{ vars.TM_OAUTH_SECRET }}
+          TM_TOTD_NOTIF_AGENT:               ${{ vars.TM_TOTD_NOTIF_AGENT }}
+          TM_TOTD_NOTIF_DISCORD_WEBHOOK_URL: ${{ vars.TM_TOTD_NOTIF_DISCORD_WEBHOOK_URL }}
+          TM_TOTD_NOTIF_SERVER_PASSWORD:     ${{ vars.TM_TOTD_NOTIF_SERVER_PASSWORD }}
+          TM_TOTD_NOTIF_SERVER_USERNAME:     ${{ vars.TM_TOTD_NOTIF_SERVER_USERNAME }}
