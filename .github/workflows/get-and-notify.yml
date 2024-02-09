@@ -15,11 +15,13 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      # - name: install dependencies
-      #   run: |
-      #     python -m pip install --upgrade pip
-      #     pip install discord-webhook requests
+      - name: install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install discord-webhook requests
       - name: run script
         run: python -m main
         env:
           DEV_TMIO_API_BASE: ${{ vars.DEV_TMIO_API_BASE }}
+          DEV_TOTD_NOTIF_AGENT_TMIO: ${{ vars.DEV_TOTD_NOTIF_AGENT_TMIO }}
+          DEV_TOTD_NOTIF_DISCORD_WEBHOOK: ${{ vars.DEV_TOTD_NOTIF_DISCORD_WEBHOOK }}
