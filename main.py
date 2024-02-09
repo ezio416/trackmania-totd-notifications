@@ -57,6 +57,8 @@ def get_map_info(track: dict) -> dict:
     track['name']        = strip_format_codes(single['name'])
     track['thumb_url']   = single['thumbnailUrl']
 
+    track['author_name'] = get_account_name(track['author_id'])
+
     print(f"getting map info for {track['uid']} ({track['name']}) done")
 
     return track
@@ -159,27 +161,23 @@ def strip_format_codes(raw: str) -> str:
 
 
 def main():
-    track: dict = get_track()
-    track = get_map_info(track)
-    track['author_name'] = get_account_name(track['author_id'])
-
-    tmio_author_url: str = f"https://trackmania.io/#/player/{track['author_id']}"
-    tmio_map_url:    str = f"https://trackmania.io/#/totd/leaderboard/{track['season']}/{track['uid']}"
-
-########################################################################################################################
+    track: dict = get_map_info(get_track())
 
     print('webhook starting')
 
-    webhook = DiscordWebhook(os.environ['TM_TOTD_NOTIF_DISCORD_WEBHOOK_URL'])
+    webhook = DiscordWebhook(
+        os.environ['TM_TOTD_NOTIF_DISCORD_WEBHOOK_URL'],
+        content='<@&1205378175601745970>'
+    )
 
     embed = DiscordEmbed(
         title=f"Track of the Day for {track['date']}",
         color='00a719'
     )
 
-    embed.add_embed_field('Map',          f"[{track['name']}]({tmio_map_url})",           False)
-    embed.add_embed_field('Author',       f"[{track['author_name']}]({tmio_author_url})", False)
-    embed.add_embed_field('Author Medal', track['author_time'],                           False)
+    embed.add_embed_field('Map', f"[{track['name']}](https://trackmania.io/#/totd/leaderboard/{track['season']}/{track['uid']})", False)
+    embed.add_embed_field('Author', f"[{track['author_name']}](https://trackmania.io/#/player/{track['author_id']})", False)
+    embed.add_embed_field('Author Medal', track['author_time'], False)
     embed.set_thumbnail(track['thumb_url'])
 
     webhook.add_embed(embed)
