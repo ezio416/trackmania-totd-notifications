@@ -12,7 +12,7 @@ def main() -> None:
     while True:
         now = datetime.now(timezone('Europe/Paris'))
 
-        if now.hour == 17 and now.minute == 00:
+        if now.hour == 17 and now.minute == 0:
             for i in range(5):
                 try:
                     app.main()
