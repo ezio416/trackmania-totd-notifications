@@ -1,9 +1,11 @@
 # c 2024-02-08
-# m 2024-02-08
+# m 2024-02-10
 
 from base64 import b64encode
+# from datetime import datetime
 from json import loads
 import os
+# from pytz import timezone
 from time import sleep
 
 from discord_webhook import DiscordEmbed, DiscordWebhook
@@ -140,6 +142,21 @@ def get_track() -> dict:
     return track
 
 
+def track_is_from_yesterday(uid: str) -> bool:
+    # now = datetime.now(timezone('Europe/Paris'))
+    # today = f'{now.year}-{str(now.month).zfill(2)}-{str(now.day).zfill(2)}'
+
+    # return today != date
+
+    req = get('https://raw.githubusercontent.com/ezio416/trackmania-json-tracking/main/CampaignCompletionist/next_totd.json')
+
+    loaded: dict = loads(req.text)
+    items = list(loaded.items())
+    last_track = items[-1][1]
+
+    return uid == last_track['uid']
+
+
 def strip_format_codes(raw: str) -> str:
     clean: str = ''
     flag:  int = 0
@@ -162,6 +179,9 @@ def strip_format_codes(raw: str) -> str:
 
 def main():
     track: dict = get_map_info(get_track())
+
+    if track_is_from_yesterday(track['date']):
+        raise Exception('old track')
 
     print('webhook starting')
 
