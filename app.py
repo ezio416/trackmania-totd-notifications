@@ -1,5 +1,5 @@
 # c 2024-02-08
-# m 2024-02-10
+# m 2024-02-11
 
 from base64 import b64encode
 # from datetime import datetime
@@ -12,9 +12,10 @@ from discord_webhook import DiscordEmbed, DiscordWebhook
 from requests import get, post
 
 
-url_core = 'https://prod.trackmania.core.nadeo.online'
-url_live = 'https://live-services.trackmania.nadeo.live'
-wait_time = 0.5
+uid_file:  str   = os.path.abspath('./last_uid.txt')
+url_core:  str   = 'https://prod.trackmania.core.nadeo.online'
+url_live:  str   = 'https://live-services.trackmania.nadeo.live'
+wait_time: float = 0.5
 
 
 def format_race_time(input_ms: int) -> str:
@@ -148,13 +149,26 @@ def track_is_from_yesterday(uid: str) -> bool:
 
     # return today != date
 
-    req = get('https://raw.githubusercontent.com/ezio416/trackmania-json-tracking/main/CampaignCompletionist/next_totd.json')
+####################
 
-    loaded: dict = loads(req.text)
-    items = list(loaded.items())
-    last_track = items[-1][1]
+    # req = get('https://raw.githubusercontent.com/ezio416/trackmania-json-tracking/main/CampaignCompletionist/next_totd.json')
 
-    return uid == last_track['uid']
+    # loaded: dict = loads(req.text)
+    # items = list(loaded.items())
+    # last_track = items[-1][1]
+
+    # return uid == last_track['uid']
+
+####################
+
+    if os.path.isfile(uid_file):
+        with open(uid_file, 'r') as f:
+            last_uid: str = f.read()
+
+        if uid == last_uid:
+            return True
+
+    return False
 
 
 def strip_format_codes(raw: str) -> str:
@@ -205,6 +219,9 @@ def main():
     webhook.execute()
 
     print('webhook done')
+
+    with open(uid_file, 'w') as f:
+        f.write(track['uid'])
 
 
 if __name__ == '__main__':
