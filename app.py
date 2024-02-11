@@ -180,7 +180,7 @@ def strip_format_codes(raw: str) -> str:
 def main():
     track: dict = get_map_info(get_track())
 
-    if track_is_from_yesterday(track['date']):
+    if track_is_from_yesterday(track['uid']):
         raise Exception('old track')
 
     print('webhook starting')
