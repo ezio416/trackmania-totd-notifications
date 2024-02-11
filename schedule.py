@@ -9,18 +9,21 @@ import app
 
 
 def main() -> None:
+    attempts:              int = 5
+    wait_between_attempts: int = 10
+
     while True:
         now = datetime.now(timezone('Europe/Paris'))
 
         if now.hour == 17 and now.minute == 0:
-            for i in range(5):
+            for i in range(attempts):
                 try:
                     app.main()
                     break
                 except Exception as e:
                     print(e)
-                    print(f'attempt {i + 1}/5 failed, waiting 5 seconds')
-                    time.sleep(5)
+                    print(f'attempt {i + 1}/{attempts} failed, waiting {wait_between_attempts} seconds')
+                    time.sleep(wait_between_attempts)
 
             print('waiting 60 seconds')
             time.sleep(60)
