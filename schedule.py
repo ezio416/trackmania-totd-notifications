@@ -1,3 +1,5 @@
+#!/usr/bin/python3.12
+
 # c 2024-02-10
 # m 2024-02-11
 
@@ -9,7 +11,7 @@ import app
 
 
 def main() -> None:
-    attempts:              int = 5
+    attempts:              int = 20
     wait_between_attempts: int = 10
 
     while True:
