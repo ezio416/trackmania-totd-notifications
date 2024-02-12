@@ -1,7 +1,7 @@
 #!/usr/bin/python3.12
 
 # c 2024-02-10
-# m 2024-02-11
+# m 2024-02-12
 
 from datetime import datetime
 from pytz import timezone
@@ -17,7 +17,7 @@ def main() -> None:
     while True:
         now = datetime.now(timezone('Europe/Paris'))
 
-        if now.hour == 17 and now.minute == 0:
+        if now.hour == 19 and now.minute == 0:
             for i in range(attempts):
                 try:
                     app.main()
