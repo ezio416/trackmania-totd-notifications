@@ -24,13 +24,13 @@ def main() -> None:
                     break
                 except Exception as e:
                     print(e)
-                    print(f'attempt {i + 1}/{attempts} failed, waiting {wait_between_attempts} seconds')
+                    print(f'attempt {i + 1}/{attempts} failed, waiting {wait_between_attempts} seconds (currently {now.strftime('%Y-%m-%d %H:%M:%S')})')
                     time.sleep(wait_between_attempts)
 
             print('waiting 60 seconds')
             time.sleep(60)
         else:
-            print(f'waiting ({now.strftime('%Y-%m-%d %H:%M:%S')})')
+            print(f'waiting (currently {now.strftime('%Y-%m-%d %H:%M:%S')})')
             time.sleep(1)
 
 
