@@ -1,7 +1,7 @@
 #!/usr/bin/python3.12
 
 # c 2024-02-08
-# m 2024-02-11
+# m 2024-02-12
 
 from base64 import b64encode
 # from datetime import datetime
@@ -45,6 +45,60 @@ def get_account_name(id: str) -> str:
     return name
 
 
+def get_likely_style(account_id: str) -> str:
+    if account_id in (
+        'ce6c0db0-2dd9-463f-aaec-463032bad4c5',  # emlan
+    ):
+        return 'Bobsleigh/Grass'
+
+    if account_id in (
+        '041623e9-57de-4dea-8fd2-6adf967ba558',  # ealipse
+        '3d71524d-922d-4755-9f9a-86bd93cedbf9',  # intax
+        'eb46a97e-2057-4544-8557-bc8e9d425d37',  # microvert
+    ):
+        return 'Dirt/Grass Tech'
+
+    if account_id in (
+        '85c745ee-d3b4-46d1-bd21-3566b5e9f3f6',  # habe
+        '7599d4de-2ced-46d0-abf6-91612e1dca30',  # spec
+    ):
+        return 'Dirt Tech'
+
+    if account_id in (
+        '435ecb19-a003-4a79-9f3c-a5572a0dc8a8',  # agrabou
+        'babd5821-8cad-4ccd-9a80-218d0e3afd50',  # aries
+        '701b9536-bc38-4a98-88eb-abe6cb174c0d',  # striderin
+        'e5ed5a9c-fdaf-4c8a-872b-50da739f91a4',  # vekisis
+    ):
+        return 'Fullspeed'
+
+    if account_id in (
+        'd3d84336-fc5f-49fd-b866-b15ca80152a8',  # andybaguette
+        '17c3f129-c877-45b8-8bd1-80d7a4f9fc29',  # capman
+        '78332411-010f-4d61-84d8-0db1d6b5f8c0',  # henkisme
+    ):
+        return 'Ice'
+
+    if account_id in (
+        'fc42881d-56fd-4206-9515-3a7222a67304',  # souldrinker
+    ):
+        return 'Plastic Tech'
+
+    if account_id in (
+        'dcc6b861-acdb-44bd-b73c-345a78d58a98',  # oregox
+        '3468343f-bc7f-4ddd-938f-0f118d13cdc9',  # proff
+    ):
+        return 'Speed Tech'
+
+    if account_id in (
+        '8ffe695a-8aff-4378-a85f-a503a1abb256',  # ddolla
+        'a0f1b480-7b9b-44e7-9ca3-2196fc16cb3a',  # sloopkogel
+    ):
+        return 'Tech'
+
+    return ''
+
+
 def get_map_info(track: dict) -> dict:
     print(f'getting map info for {track['uid']}')
 
@@ -63,6 +117,7 @@ def get_map_info(track: dict) -> dict:
     track['thumb_url']   = single['thumbnailUrl']
 
     track['author_name'] = get_account_name(track['author_id'])
+    track['likely_style'] = get_likely_style(track['author_id'])
 
     print(f'getting map info for {track['uid']} ({track['name']}) done')
 
@@ -214,6 +269,10 @@ def main():
     embed.add_embed_field('Map', f'[{track['name']}](https://trackmania.io/#/totd/leaderboard/{track['season']}/{track['uid']})', False)
     embed.add_embed_field('Author', f'[{track['author_name']}](https://trackmania.io/#/player/{track['author_id']})', False)
     embed.add_embed_field('Author Medal', track['author_time'], False)
+
+    if track['likely_style'] != '':
+        embed.add_embed_field('Likely Style (based on author)', track['likely_style'], False)
+
     embed.set_thumbnail(track['thumb_url'])
 
     webhook.add_embed(embed)
