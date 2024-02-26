@@ -10,6 +10,11 @@ import time
 import app
 
 
+def log(msg: str) -> None:
+    with open('errors.log', 'a', newline='\n') as f:
+        f.write(f'{msg}\n')
+
+
 def main() -> None:
     app.main()
 
@@ -26,7 +31,12 @@ def main() -> None:
                     break
                 except Exception as e:
                     print(e)
-                    print(f'attempt {i + 1}/{attempts} failed, waiting {wait_between_attempts} seconds (currently {now.strftime('%Y-%m-%d %H:%M:%S')})')
+                    log(e)
+
+                    msg: str = f'attempt {i + 1}/{attempts} failed, waiting {wait_between_attempts} seconds (currently {now.strftime('%Y-%m-%d %H:%M:%S')})'
+                    print(msg)
+                    log(msg)
+
                     time.sleep(wait_between_attempts)
 
             print('waiting 60 seconds')
