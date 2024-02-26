@@ -1,7 +1,7 @@
 #!/usr/bin/python3.12
 
 # c 2024-02-10
-# m 2024-02-12
+# m 2024-02-26
 
 from datetime import datetime
 from pytz import timezone
@@ -11,6 +11,8 @@ import app
 
 
 def main() -> None:
+    app.main()
+
     attempts:              int = 20
     wait_between_attempts: int = 10
 
