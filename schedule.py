@@ -16,7 +16,11 @@ def log(msg: str) -> None:
 
 
 def main() -> None:
-    app.main()
+    try:
+        app.main()
+    except Exception as e:
+        print(e)
+        log(e)
 
     attempts:              int = 20
     wait_between_attempts: int = 10
