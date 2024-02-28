@@ -40,7 +40,7 @@ def main() -> None:
             for i in range(attempts):
                 try:
                     app.main()
-                    break
+                    return
                 except Exception as e:
                     log(e)
 
