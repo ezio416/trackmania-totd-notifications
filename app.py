@@ -1,7 +1,7 @@
 #!/usr/bin/python3.12
 
 # c 2024-02-08
-# m 2024-02-12
+# m 2024-02-28
 
 from base64 import b64encode
 # from datetime import datetime
@@ -252,7 +252,7 @@ def main():
     track: dict = get_map_info(get_track())
 
     if track_is_from_yesterday(track['uid']):
-        raise Exception('old track')
+        raise Exception(f'old track: {track['uid']}')
 
     print('webhook starting')
 
@@ -279,10 +279,15 @@ def main():
 
     webhook.execute()
 
-    print('webhook done')
+    print('webhook done, writing last_uid.txt')
 
-    with open(uid_file, 'w') as f:
+    with open(uid_file, 'w') as f:  # not working?
         f.write(track['uid'])
+
+    sleep(1)
+
+    with open(uid_file, 'r') as f:
+        print(f'last_uid: {f.read()}')
 
 
 if __name__ == '__main__':
