@@ -1,13 +1,9 @@
-#!/usr/bin/python3.12
-
 # c 2024-02-08
-# m 2024-02-28
+# m 2024-03-25
 
 from base64 import b64encode
-# from datetime import datetime
 from json import loads
 import os
-# from pytz import timezone
 from time import sleep
 
 from discord_webhook import DiscordEmbed, DiscordWebhook
@@ -178,8 +174,8 @@ def get_track() -> dict:
     year:  int = monthList['year']
     month: int = monthList['month']
 
-    uid: str = ''
-    day: int = 0
+    uid:    str = ''
+    day:    int = 0
     season: str = ''
 
     for map in reversed(monthList['days']):
@@ -200,32 +196,15 @@ def get_track() -> dict:
     return track
 
 
-def track_is_from_yesterday(uid: str) -> bool:
-    # now = datetime.now(timezone('Europe/Paris'))
-    # today = f'{now.year}-{str(now.month).zfill(2)}-{str(now.day).zfill(2)}'
-
-    # return today != date
-
-####################
-
-    # req = get('https://raw.githubusercontent.com/ezio416/trackmania-json-tracking/main/CampaignCompletionist/next_totd.json')
-
-    # loaded: dict = loads(req.text)
-    # items = list(loaded.items())
-    # last_track = items[-1][1]
-
-    # return uid == last_track['uid']
-
-####################
-
+def track_is_new(uid: str) -> bool:
     if os.path.isfile(uid_file):
         with open(uid_file, 'r') as f:
             last_uid: str = f.read()
 
         if uid == last_uid:
-            return True
+            return False
 
-    return False
+    return True
 
 
 def strip_format_codes(raw: str) -> str:
@@ -249,45 +228,57 @@ def strip_format_codes(raw: str) -> str:
 
 
 def main():
-    track: dict = get_map_info(get_track())
+    # track: dict = get_map_info(get_track())
 
-    if track_is_from_yesterday(track['uid']):
-        raise Exception(f'old track: {track['uid']}')
+    # if track_is_new(track['uid']):
+    #     raise Exception(f'old track: {track['uid']}')
 
-    print('webhook starting')
+    # print('webhook starting')
 
-    webhook = DiscordWebhook(
-        os.environ['TM_TOTD_NOTIF_DISCORD_WEBHOOK_URL'],
-        content='<@&1205378175601745970>'
+    # webhook = DiscordWebhook(
+    #     os.environ['TM_TOTD_NOTIF_DISCORD_WEBHOOK_URL'],
+    #     content='<@&1205378175601745970>'
+    # )
+
+    # embed = DiscordEmbed(
+    #     title=f'Track of the Day for {track['date']}',
+    #     color='00a719'
+    # )
+
+    # embed.add_embed_field('Map', f'[{track['name']}](https://trackmania.io/#/totd/leaderboard/{track['season']}/{track['uid']})', False)
+    # embed.add_embed_field('Author', f'[{track['author_name']}](https://trackmania.io/#/player/{track['author_id']})', False)
+    # embed.add_embed_field('Author Medal', track['author_time'], False)
+
+    # if track['likely_style'] != '':
+    #     embed.add_embed_field('Likely Style (based on author)', track['likely_style'], False)
+
+    # embed.set_thumbnail(track['thumb_url'])
+
+    # webhook.add_embed(embed)
+
+    # webhook.execute()
+
+    # print('webhook done, writing last_uid.txt')
+
+    # with open(uid_file, 'w') as f:  # not working?
+    #     f.write(track['uid'])
+
+    # sleep(1)
+
+    # with open(uid_file, 'r') as f:
+    #     print(f'last_uid: {f.read()}')
+
+    accountId = '594be80b-62f3-4705-932b-e743e97882cf'
+    token = get_token('NadeoServices')
+
+    req = get(
+        f'{url_core}/accounts/{accountId}/mapRecords',
+        headers={'Authorization': token}
     )
 
-    embed = DiscordEmbed(
-        title=f'Track of the Day for {track['date']}',
-        color='00a719'
-    )
+    loaded = req.json()
 
-    embed.add_embed_field('Map', f'[{track['name']}](https://trackmania.io/#/totd/leaderboard/{track['season']}/{track['uid']})', False)
-    embed.add_embed_field('Author', f'[{track['author_name']}](https://trackmania.io/#/player/{track['author_id']})', False)
-    embed.add_embed_field('Author Medal', track['author_time'], False)
-
-    if track['likely_style'] != '':
-        embed.add_embed_field('Likely Style (based on author)', track['likely_style'], False)
-
-    embed.set_thumbnail(track['thumb_url'])
-
-    webhook.add_embed(embed)
-
-    webhook.execute()
-
-    print('webhook done, writing last_uid.txt')
-
-    with open(uid_file, 'w') as f:  # not working?
-        f.write(track['uid'])
-
-    sleep(1)
-
-    with open(uid_file, 'r') as f:
-        print(f'last_uid: {f.read()}')
+    pass
 
 
 if __name__ == '__main__':

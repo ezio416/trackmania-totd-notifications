@@ -1,7 +1,5 @@
-#!/usr/bin/python3.12
-
 # c 2024-02-10
-# m 2024-02-28
+# m 2024-03-25
 
 from datetime import datetime as dt
 from pytz import timezone
@@ -59,4 +57,3 @@ def main() -> None:
 
 if __name__ == '__main__':
     main()
-
